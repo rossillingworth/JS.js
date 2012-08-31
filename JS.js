@@ -44,7 +44,31 @@ var JS = {
         return target;
     }
 
-
+    ,IS:{
+        object:function(obj){
+            return obj === Object(obj);
+        }
+        ,type:function(object,type){
+            var boolean = (Object.prototype.toString.call(object) == type);
+            return boolean;
+        }
+    }
+    ,ASSERT:{
+        AssertException:function AssertException(message) {
+            this.message = message;
+        }
+        ,condition:function(exp,expected,message){
+            if(exp != expected){
+                throw new JS.ASSERT.AssertException(message);
+            }
+        }
+        ,isTrue:function(exp,message){
+            return JS.ASSERT.condition(exp,true,message);
+        }
+        ,isFalse:function(exp,message){
+            return JS.ASSERT.condition(exp,false,message);
+        }
+    }
     ,DOM:{
         /**
          * Wrapper to getElementById
@@ -110,7 +134,7 @@ var JS = {
             ,getConfigObject:function(element, configAttributeName){
                 configAttributeName = configAttributeName || "config";
                 var configObjName = JS.DOM.DATA.getDataAttribute(element,configAttributeName,undefined);
-                var configObj = (configObjName)?JS.OBJECT.getChildObject(window,configObjName):undefined;
+                var configObj = (configObjName)?JS.OBJECT.getProperty(window,configObjName):undefined;
                 return  configObj;
             }
             /**
@@ -124,7 +148,7 @@ var JS = {
             ,getConfigParam:function(element, configAttributeName, argPath, defaultValue){
                 configAttributeName = configAttributeName || "config";
                 var configObj = JS.DOM.DATA.getConfigObject(element,configAttributeName);
-                var returnValue = (configObj && argPath)?JS.OBJECT.getChildObject(configObj,argPath):undefined;
+                var returnValue = (configObj && argPath)?JS.OBJECT.getProperty(configObj,argPath):undefined;
                 return  returnValue || defaultValue ;
             }
             /**
@@ -349,23 +373,60 @@ var JS = {
     }
     ,OBJECT:{
         /**
-         * Return the child object given the parent object and a string based name
+         * Get an object property,
+         * allows a property chain in the name
          * @param object
-         * @param path
+         * @param name
          * @return {*}
          */
-        getChildObject:function(object,path){
-            var child = undefined;
-            child = _.reduce(path.split("."),function(obj,name){
-                return (obj)?obj[name]:undefined;
-            },object);
-            return child;
-        }
-        ,create:function(){
-            var args = JS.ARRAY.fromCollection(arguments);
-            if(args.length % 2 != 0){
-                throw new Error("unpaired arguments can not be used to populate object");
+        getProperty:function(object,name){
+            // todo: regex validate name
+            name = name.split(".");
+            object = object || window;
+            while(name.length){
+                object = (object)?object[name.shift()]:undefined;
             }
+            return object;
+        }
+        ,
+        /**
+         * Set a property on an object
+         *
+         * Can be used to guarantee a namespace exists.
+         * eg: JS.OBJECT.setProperty(window,"my.long.name.space.object")
+         *
+         * @param object
+         * @param path property name, allows a chain of property names (eg: "foo.bar.meg.mog")
+         * @param value optional, defaults to an empty object
+         * @param extend optional, use to inject instead of overwrite value, defaults to false
+         * @return {*}
+         */
+        setProperty:function(object,path,value,extend){
+            // todo: regex validate path
+            JS.ASSERT.isTrue((arguments.length >= 2),"setProperty must have at least 2 arguments");
+            path = path.split(".");
+            value = value || {};
+            extend = extend || false;
+
+            while(path.length){
+                var n = path.shift();
+                if(object[n] == undefined){
+                    object[n] = {};
+                }
+                if(!(path.length)){
+                    if(extend && JS.IS.object(object[n])){
+                        object[n] = JS.extend(object[n],value);
+                    }else{
+                        object[n] = value;
+                    }
+                }
+                object = object[n];
+            }
+            return object;
+        }
+        ,createFromArgPairs:function(){
+            JS.ASSERT.isTrue((arguments.length % 2 == 0),"createFromArgPairs: unpaired arguments can not be used to populate an object");
+            var args = JS.ARRAY.fromCollection(arguments);
             var obj = {};
             while(args.length > 0){
                 var key = args.shift();
@@ -373,22 +434,6 @@ var JS = {
                 obj[key] = value;
             }
             return obj;
-        }
-        ,ensurePath:function(path, object){
-            object = object || window;
-            path = path.split(".");
-            for(num in path){
-                var n = path[num];
-                if(object[n]  == undefined){
-                    object[n] = {};
-                }
-                object = object[n];
-            }
-            return object;
-        }
-        ,isType:function(object,type){
-            var boolean = (Object.prototype.toString.call(object) == type);
-            return boolean;
         }
     }
     ,FUNCTION:{
@@ -438,6 +483,9 @@ var JS = {
         }
 
     }
+    ,REGEX:{
+        varName:/^[_$A-Za-z]$/
+    }
 };
 
 JS.OBJECT.isString = JS.FUNCTION.partial(JS.OBJECT.isType, [undefined, "[object String]"]);
@@ -473,13 +521,13 @@ var $class = JS.DOM.getElementsByClass;
 
 //Sizzle( String selector, DOMElement|DOMDocument context )
 //
-//The primary method of calling Sizzle � pass in a selector and an optional context (if no context is provided the root �document� is used). Runs the specified selector and returns an array of matched DOMElements.
+//The primary method of calling Sizzle ? pass in a selector and an optional context (if no context is provided the root ?document? is used). Runs the specified selector and returns an array of matched DOMElements.
 //Sizzle( String selector, DOMElement|DOMDocument context, Array results )
 //
-//An alternative to the previous method of calling Sizzle � pass in an existing array and the results will be appended on to that array.
+//An alternative to the previous method of calling Sizzle ? pass in an existing array and the results will be appended on to that array.
 //Sizzle.matches( String selector, Array<DOMElement> set )
 //
-//Takes in a set of DOMElements, filters them against the specified selector, and returns the results. The selector can be a full selector (e.g. �div > span.foo�) and not just a fragment.
+//Takes in a set of DOMElements, filters them against the specified selector, and returns the results. The selector can be a full selector (e.g. ?div > span.foo?) and not just a fragment.
 
 
 
@@ -490,4 +538,3 @@ var $class = JS.DOM.getElementsByClass;
 // ie: trim -> split.partial(",") -> join("|")
 // also allows verify functions to be added at start / end
 // NB: throw exceptions when bad errors...!
-

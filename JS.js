@@ -15,6 +15,7 @@ var JS = {
     ,debugDetail:5
     ,empty:{}
     ,isEmptyObject:function(obj){
+        JS.ASSERT.isTrue(JS.IS.object(obj),"Not an Object");
         for(var propName in obj){
             if(obj.hasOwnProperty(propName)){
                 return false;

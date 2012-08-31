@@ -9,8 +9,8 @@ describe("JS.js Library", function(){
         expect(JS.isEmptyObject({})).toBe(true);
         expect(JS.isEmptyObject({a:1})).toBe(false);
         // in error
-        expect(function(){JS.isEmptyObject(1);}).toThrow();
-        expect(function(){JS.isEmptyObject("");}).toThrow();
+        expect(function(){JS.isEmptyObject(1);}).toThrow(JS.ASSERT.AssertException);
+        expect(function(){JS.isEmptyObject("");}).toThrow(JS.ASSERT.AssertException);
     });
 
 
@@ -20,16 +20,29 @@ describe("JS.js Library", function(){
 //        expect(JS.extend("",1)).toEqual({a:1,b:2});
     });
 
-    it("IS.object",function(){
-        expect(JS.IS.object({})).toBe(true);
-        expect(JS.IS.object([])).toBe(true);
-        expect(JS.IS.object("aaa")).toBe(false);
-        expect(JS.IS.object(111)).toBe(false);
+    describe("IS",function(){
+        it("object",function(){
+            expect(JS.IS.object({})).toBe(true);
+            expect(JS.IS.object([])).toBe(true);
+            expect(JS.IS.object("aaa")).toBe(false);
+            expect(JS.IS.object(111)).toBe(false);
+        });
+
+        it("type",function(){
+            expect(JS.IS.type("aaa","[object String]")).toBe(true);
+            expect(JS.IS.type([],"[object Array]")).toBe(true);
+            expect(JS.IS.type(function(){},"[object Function]")).toBe(true);
+        });
     });
 
-    it("IS.type",function(){
-        expect(JS.IS.type("aaa","[object String]")).toBe(true);
-        expect(JS.IS.type([],"[object Array]")).toBe(true);
-        expect(JS.IS.type(function(){},"[object Function]")).toBe(true);
+    describe("ASSERT",function(){
+        expect(JS.ASSERT.condition(true,false,"message")).toThrow(JS.ASSERT.AssertException);
+        expect(JS.ASSERT.condition(true,true,"message")).not.toThrow(JS.ASSERT.AssertException);
+
+        expect(JS.ASSERT.condition(1,2,"message")).toThrow(JS.ASSERT.AssertException);
+        expect(JS.ASSERT.condition(1,1,"message")).not.toThrow(JS.ASSERT.AssertException);
+
     });
+
+
 });

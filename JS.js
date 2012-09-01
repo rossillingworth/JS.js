@@ -58,16 +58,16 @@ var JS = {
         AssertException:function AssertException(message) {
             this.message = message;
         }
-        ,condition:function(exp,expected,message){
+        ,expressionIs:function(exp,expected,message){
             if(exp != expected){
                 throw new JS.ASSERT.AssertException(message);
             }
         }
         ,isTrue:function(exp,message){
-            return JS.ASSERT.condition(exp,true,message);
+            return JS.ASSERT.expressionIs(exp,true,message);
         }
         ,isFalse:function(exp,message){
-            return JS.ASSERT.condition(exp,false,message);
+            return JS.ASSERT.expressionIs(exp,false,message);
         }
     }
     ,DOM:{

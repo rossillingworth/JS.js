@@ -54,13 +54,13 @@ var JS = {
         getElement:function(el){
             return (typeof el === "string")?document.getElementById(el):el;
         }
-        ,getElementsByClass:function(className,parent,tag) {
+        ,getElementsByClassName:function(className,parent,tag) {
             parent = parent || document;
             tag = tag || "*";
             var classElements = [];
             var els = parent.getElementsByTagName(tag);
             var elsLen = els.length;
-            var pattern = new RegExp('(^|\\\\s)'+className+'(\\\\s|$)');
+            var pattern = new RegExp('(^|\\s)'+className+'(\\s|$)');
             for (i = 0; i < elsLen; i++) {
                 if ( pattern.test(els[i].className) ) {
                     classElements.push(els[i]);

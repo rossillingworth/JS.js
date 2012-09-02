@@ -36,4 +36,34 @@ describe("JS.js Library", function(){
     });
 
 
+    describe("OBJECT",function(){
+
+        it("setProperty",function(){
+
+            var o1 = {a:1};
+            var o2 = JS.OBJECT.setProperty(o1,"b.c.d",2);
+            expect(o1).toEqual({a:1,b:{c:{d:2}}});
+            expect(o2).toEqual(2);
+
+
+            var o3 = {a:1,b:{c:1}};
+            var o4 = JS.OBJECT.setProperty(o3,"b",2);
+            expect(o3).toEqual({a:1,b:2});
+            expect(o4).toEqual(2);
+
+            var o5 = {a:1,b:{c:1}};
+            var o6 = JS.OBJECT.setProperty(o5,"b.c",{f:999,g:999},true);
+            expect(o5).toEqual({a:1,b:{c:{f:999,g:999}}});
+            expect(o6).toEqual({f:999,g:999});
+
+
+            var o7 = {a:1,b:{c:{d:1}}};
+            var o8 = JS.OBJECT.setProperty(o7,"b.c",{f:999,g:999},true);
+            expect(o7).toEqual({a:1,b:{c:{d:1,f:999,g:999}}});
+            expect(o8).toEqual({d:1,f:999,g:999});
+
+        });
+
+    });
+
 });

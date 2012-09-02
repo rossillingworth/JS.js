@@ -455,8 +455,8 @@ var JS = {
                     object[n] = {};
                 }
                 if(!(path.length)){
-                    if(extend && JS.IS.object(object[n])){
-                        object[n] = JS.extend(object[n],value);
+                    if(extend && _.isObject(object[n])){
+                        object[n] = _.extend(object[n],value);
                     }else{
                         object[n] = value;
                     }

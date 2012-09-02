@@ -1,21 +1,33 @@
 
+/**
+ * This is a simple collection of useful functions.
+ * Either found on the internet or created by me over the years.
+ *
+ * Everything is name-spaced to make them easy to find
+ *
+ * if you think I have missed attributing you for a function,
+ * just let me know and show me your original publication/blog etc.
+ */
 
-if(!Array.remove){
-    Array.remove = function(array, from, to) {
-        var rest = array.slice((to || from) + 1 || array.length);
-        array.length = from < 0 ? array.length + from : from;
-        return array.push.apply(array, rest);
-    };
+/**
+ * Why use underscore?
+ * simple, because it already works really well
+ * so why rebuild the wheel
+ *
+ * NB: my version of partial binding allows merging arguments
+ */
+if(!window["_"]){
+    throw new Error("JS.js requires the underscore library")
 }
-
 
 
 var JS = {
     debug:false
     ,debugDetail:5
     ,empty:{}
+    ,deprecated:function(name){alert(name + " has been deprecated in favour of underscore");debugger;}
     ,isEmptyObject:function(obj){
-        JS.ASSERT.isTrue(JS.IS.object(obj),"Not an Object");
+        JS.deprecated("isEmptyObject");
         for(var propName in obj){
             if(obj.hasOwnProperty(propName)){
                 return false;
@@ -25,7 +37,13 @@ var JS = {
     }
     ,timestamp:function(){return (new Date()).valueOf();}
     ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && lvl<=JS.debugDetail){console.log(msg);}}
+    ,testForError:function(test,errorMessage){
+        if(test){
+            throw new Error(errorMessage);
+        }
+    }
     ,extend:function (source,target){
+        JS.deprecated("JS.extend");
         //if(!target){target = this;}
         for(var propName in source){
             if(source.hasOwnProperty(propName)){
@@ -47,9 +65,11 @@ var JS = {
 
     ,IS:{
         object:function(obj){
+            JS.deprecated("JS.extend");
             return obj === Object(obj);
         }
         ,type:function(object,type){
+            JS.deprecated("JS.extend");
             var boolean = (Object.prototype.toString.call(object) == type);
             return boolean;
         }
@@ -116,8 +136,47 @@ var JS = {
         ,hide:function(el){
             el = JS.DOM.getElement(el);
             el.style.display = "none";
+        },
+        /**
+         * taken from http://dzone.com/snippets/javascript-function-checks-dom
+         * @param obj
+         * @return {*}
+         */
+        isVisible:function(obj)
+        {
+            if (obj == document) return true
+
+            if (!obj) return false
+            if (!obj.parentNode) return false
+            if (obj.style) {
+                if (obj.style.display == 'none') return false
+                if (obj.style.visibility == 'hidden') return false
+            }
+
+            //Try the computed style in a standard way
+            if (window.getComputedStyle) {
+                var style = window.getComputedStyle(obj, "")
+                if (style.display == 'none') return false
+                if (style.visibility == 'hidden') return false
+            }
+
+            //Or get the computed style using IE's silly proprietary way
+            var style = obj.currentStyle
+            if (style) {
+                if (style['display'] == 'none') return false
+                if (style['visibility'] == 'hidden') return false
+            }
+
+            return JS.DOM.isVisible(obj.parentNode)
         }
         ,DATA:{
+            /**
+             *
+             * @param element
+             * @param name
+             * @param defaultValue
+             * @return {*}
+             */
             getDataAttribute:function(element,name,defaultValue){
                 var data = element.getAttribute("data-" + name);
                 return data || defaultValue;
@@ -166,17 +225,33 @@ var JS = {
             }
         }
         ,FORM:{
+            /**
+             * Get an array of all elements in a form
+             * @param form
+             * @return {Array}
+             */
+            getFormElements:function(form){
+                var inputs = JS.ARRAY.fromCollection(form.getElementsByTagName("input"));
+                var lists = JS.ARRAY.fromCollection(form.getElementsByTagName("select"));
+                var textareas = JS.ARRAY.fromCollection(form.getElementsByTagName("textarea"));
+                var allFormElements = [].concat(inputs,lists,textareas);
+                return allFormElements;
+            }
+            ,
+            /**
+             * Get the value of a form element
+             * as it would bee seen by the server when submitted
+             *
+             * @param el
+             * @return {*}
+             */
             getValue:function(el){
                 el = JS.DOM.getElement(el);
                 var type = el.tagName;
+                var value = "";
                 switch (type){
-                    case "INPUT":
-                    case "TEXTAREA":
-                    case "OPTION":
-                        return el.value;
-                        break;
                     case "CHECKBOX":
-                        return (el.checked)?el.value:"";
+                        return (el.checked)?el.value||"true":"";
                         break;
                     case "SELECT":
                         var options = el.options;
@@ -186,17 +261,29 @@ var JS = {
                                 value.push(options[i].value);
                             }
                         }
-                        return value.join(",");
+                        value = value.join(",");
+                        break;
+                    case "INPUT":
+                    case "TEXTAREA":
+                    case "OPTION":
+                        value = el.value;
                         break;
                     default:
                         throw new Error("unknown form element type: " + type);
                 }
+                return value;
             }
         }
     }
     ,STRING:{
         reverse:function(str){return str.split("").reverse().join("");}
-        ,trim:function(str){return str.replace(/^\s+|\s+$/g, '');}
+        ,
+        /**
+         * remove spaces from either side of a string
+         * @param str
+         * @return {*}
+         */
+        trim:function(str){return str.replace(/^\s+|\s+$/g, '');}
         /**
          * Simple string format
          * eg: format("my string %1 great %2","is",2)
@@ -252,7 +339,7 @@ var JS = {
         fromCollection:function(collectionObj){
             try{
                 // IE8 has broken this...!
-                return Array().slice.call(collectionObj);
+                return Array.prototype.slice.call(collectionObj)
             }catch(ex){
                 //so we need this
                 var arr = [];
@@ -260,6 +347,21 @@ var JS = {
                     arr.push(collectionObj[i]);
                 }
                 return arr;
+            }
+        }
+        ,remove:function(array, from, to) {
+            var rest = array.slice((to || from) + 1 || array.length);
+            array.length = from < 0 ? array.length + from : from;
+            return array.push.apply(array, rest);
+        }
+        ,recursiveFunctionCallGenerator:function(func,recursiveFunc,thisArg){
+            recursiveFunc = recursiveFunc || _.each;
+            return function(el,ind,arr){
+                if(el instanceof Array){
+                    return recursiveFunc(el,JS.ARRAY.recursiveFunctionCallGenerator(func,recursiveFunc,thisArg));
+                }else{
+                    return func.call(thisArg,el);
+                }
             }
         }
         ,FILTERS:{
@@ -291,22 +393,32 @@ var JS = {
         }
         ,MAP:{
             trim:function(el,ind,arr){
+                JS.deprecated("JS.ARRAY.MAP.trim");
                 //arr[ind] = arr[ind].
                 if(el instanceof Array){
                     return el.map(JS.ARRAY.MAP.trim);
                 }
                 return JS.String.trim(arr[ind]);
             }
-            ,recurseWith:function(func,thisArg){
+            ,
+            /**
+             *
+             * @param func
+             * @param thisArg
+             * @return {Function}
+             */
+            recurseWith:function(func, thisArg){
+                JS.deprecated("JS.ARRAY.MAP.recurseWith > recursiveFunctionCallGenerator");
                 return function(el,ind,arr){
                     if(el instanceof Array){
-                        return el.map(JS.ARRAY.MAP.recurseWith(func));
+                        return _.each(el,JS.ARRAY.MAP.recurseWith(func));
                     }else{
                         return func.call(thisArg,el);
                     }
                 }
             }
         }
+
     }
     ,BASE64:{
         key_Str:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
@@ -439,9 +551,11 @@ var JS = {
     }
     ,FUNCTION:{
         bind:function(method, object){
+            JS.deprecated("JS.FUNCTION.bind");
             return function() { return method.apply(object, arguments); };
         }
         ,createDelegate:function createDelegate(argsArray/*,thisp*/){
+            JS.deprecated("JS.FUNCTION.bind");
             //var argsArray = [].slice.call(arguments, 0);
             //debugger;
             var func = this;
@@ -454,6 +568,7 @@ var JS = {
 
         ,curry:function()
         {
+            JS.deprecated("JS.FUNCTION.bind");
             var method = this, args = Array.prototype.slice.call(arguments);
             return function()
             {
@@ -489,16 +604,9 @@ var JS = {
     }
 };
 
-JS.OBJECT.isString = JS.FUNCTION.partial(JS.OBJECT.isType, [undefined, "[object String]"]);
-JS.OBJECT.isArray = JS.FUNCTION.partial(JS.OBJECT.isType, [undefined, "[object Array]"]);
-JS.OBJECT.isFunction = JS.FUNCTION.partial(JS.OBJECT.isType, [undefined, "[object Function]"] );
-
 // #############################################
 // ###### Utility functions#####################
 // #############################################
-
-var $id = JS.DOM.getElement;
-var $class = JS.DOM.getElementsByClass;
 
 
 // if TM Functions can check for THIS
@@ -507,7 +615,7 @@ var $class = JS.DOM.getElementsByClass;
 // therefore can be used to extend String
 // or called directly
 // ie: JS.STRING.reverse(myString)
-// or given a shortcut
+// or given a schortcut
 // ie: var reverse = JS.STRING.reverse;
 // or wrapped in a partial
 // var logFormat = JS.STRING.format.partial("Time:%1, Log:%2")
@@ -539,3 +647,5 @@ var $class = JS.DOM.getElementsByClass;
 // ie: trim -> split.partial(",") -> join("|")
 // also allows verify functions to be added at start / end
 // NB: throw exceptions when bad errors...!
+
+

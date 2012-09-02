@@ -76,7 +76,7 @@ var JS = {
          */
         ,createElement:function(tagname,attribs,parent){
             var el = document.createElement(tagname);
-            if (attribs){JS.extend(attribs, el);}
+            if (attribs){_.extend(el,attribs);}
             if (parent) {
                 parent = JS.DOM.getElement(parent);
                 parent.appendChild(el);

@@ -26,68 +26,22 @@ var JS = {
     ,debugDetail:5
     ,empty:{}
     ,deprecated:function(name){alert(name + " has been deprecated in favour of underscore");debugger;}
-    ,isEmptyObject:function(obj){
-        JS.deprecated("isEmptyObject");
-        for(var propName in obj){
-            if(obj.hasOwnProperty(propName)){
-                return false;
-            }
-        }
-        return true;
-    }
     ,timestamp:function(){return (new Date()).valueOf();}
     ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && lvl<=JS.debugDetail){console.log(msg);}}
-    ,testForError:function(test,errorMessage){
-        if(test){
-            throw new Error(errorMessage);
-        }
-    }
-    ,extend:function (source,target){
-        JS.deprecated("JS.extend");
-        //if(!target){target = this;}
-        for(var propName in source){
-            if(source.hasOwnProperty(propName)){
-                try{
-                    JS.log("applying prop["+propName+"]");
-                    try{target[propName] = source[propName];}catch(exc){JS.log("error:" + exc.message);}
-                    if(typeof(source[propName]) == 'object'){
-                        JS.log("recurse into " + propName);
-                        JS.extend(source[propName],target[propName]);
-                    }
-                }catch(ex){
-                    // ignore errors, uncomment for debugging
-                    JS.log("error extending object: " + ex.message);
-                }
-            }
-        }
-        return target;
-    }
-
-    ,IS:{
-        object:function(obj){
-            JS.deprecated("JS.extend");
-            return obj === Object(obj);
-        }
-        ,type:function(object,type){
-            JS.deprecated("JS.extend");
-            var boolean = (Object.prototype.toString.call(object) == type);
-            return boolean;
-        }
-    }
     ,ASSERT:{
         AssertException:function AssertException(message) {
             this.message = message;
         }
-        ,expressionIs:function(exp,expected,message){
-            if(exp != expected){
-                throw new JS.ASSERT.AssertException(message);
+        ,is:function(exp,expected,message){
+            if(!(_.isEqual(exp,expected))){
+                throw new Error(message);
             }
         }
         ,isTrue:function(exp,message){
-            return JS.ASSERT.expressionIs(exp,true,message);
+            return JS.ASSERT.is(exp,true,message);
         }
         ,isFalse:function(exp,message){
-            return JS.ASSERT.expressionIs(exp,false,message);
+            return JS.ASSERT.is(exp,false,message);
         }
     }
     ,DOM:{
@@ -391,33 +345,7 @@ var JS = {
                 JS.log(ind + " = " + arr[ind]);
             }
         }
-        ,MAP:{
-            trim:function(el,ind,arr){
-                JS.deprecated("JS.ARRAY.MAP.trim");
-                //arr[ind] = arr[ind].
-                if(el instanceof Array){
-                    return el.map(JS.ARRAY.MAP.trim);
-                }
-                return JS.String.trim(arr[ind]);
-            }
-            ,
-            /**
-             *
-             * @param func
-             * @param thisArg
-             * @return {Function}
-             */
-            recurseWith:function(func, thisArg){
-                JS.deprecated("JS.ARRAY.MAP.recurseWith > recursiveFunctionCallGenerator");
-                return function(el,ind,arr){
-                    if(el instanceof Array){
-                        return _.each(el,JS.ARRAY.MAP.recurseWith(func));
-                    }else{
-                        return func.call(thisArg,el);
-                    }
-                }
-            }
-        }
+        ,MAP:{}
 
     }
     ,BASE64:{
@@ -550,36 +478,8 @@ var JS = {
         }
     }
     ,FUNCTION:{
-        bind:function(method, object){
-            JS.deprecated("JS.FUNCTION.bind");
-            return function() { return method.apply(object, arguments); };
-        }
-        ,createDelegate:function createDelegate(argsArray/*,thisp*/){
-            JS.deprecated("JS.FUNCTION.bind");
-            //var argsArray = [].slice.call(arguments, 0);
-            //debugger;
-            var func = this;
-            var thisp = arguments[2] || arguments.caller;
-            return function(){
-                //debugger;
-                func.apply(thisp, argsArray);
-            };
-        }
-
-        ,curry:function()
-        {
-            JS.deprecated("JS.FUNCTION.bind");
-            var method = this, args = Array.prototype.slice.call(arguments);
-            return function()
-            {
-                return method.apply(this, args.concat(Array.prototype.slice.call(arguments)));
-            };
-        }
-
-
-        ,
         /**
-         * partial function
+         * partial function with binding
          * allows pre-population of function arguments
          * allows specification of injectable values using undefined
          * adds remaining arguments to function call

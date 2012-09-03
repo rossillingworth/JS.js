@@ -66,4 +66,22 @@ describe("JS.js Library", function(){
 
     });
 
+    describe("FUNCTION",function(){
+
+        it("overload",function(){
+
+            var base = function(){return Array.prototype.slice.call(arguments);}
+            expect(base(1,2,3)).toEqual([1,2,3]);
+
+            var test1 = JS.FUNCTION.overload(base,[undefined,"b",undefined,"d"]);
+
+            expect(test1(1,2,3)).toEqual([1,"b",3,"d"]);
+            expect(test1(1,2)).toEqual([1,"b",undefined,"d"]);
+            expect(test1(1,2,3,4,5)).toEqual([1,"b",3,"d",5]);
+            expect(test1(1,2,{a:1},4,5)).toEqual([1,"b",{a:1},"d",5]);
+
+        });
+
+    });
+
 });

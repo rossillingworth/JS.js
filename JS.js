@@ -496,6 +496,27 @@ var JS = {
                 args3 = args3.concat(args2); // add remaining arguments
                 return f.apply(thisp || this, args3); // now call func in current scope with joined arguments
             };
+        },
+        /**
+         * Similar to partial, except arguments override rather than merge.
+         *
+         * @param f
+         * @param args
+         * @return {Function}
+         */
+        overload:function overload(f,args/*,thisp*/){
+            var thisp = arguments[3];
+
+            return function(){
+                var args2 = Array.prototype.slice.call(arguments);
+                var args3 = [];
+                var l = Math.max(args.length,args2.length);
+                for(var i = 0; i < l; i++ ){
+                    args3[i] = (args[i]===undefined)?args2[i]:args[i];
+                }
+                return f.apply(thisp || this, args3);
+            }
+
         }
 
     }

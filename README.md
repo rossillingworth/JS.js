@@ -9,6 +9,7 @@ Also, if you want to use the JSON functions, you will need a JSON library, eg: D
 
 The Following is a list of the available functions, generated using the JS.OBJECT.document function.
 
+```javascript
 JS.debug
 JS.debugDetail
 JS.deprecated
@@ -54,6 +55,6 @@ JS.OBJECT.walk
 JS.OBJECT.document
 JS.FUNCTION.partial
 JS.FUNCTION.overload
-
+```
 
 

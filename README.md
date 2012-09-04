@@ -7,7 +7,22 @@ Recently I have removed quite a few of my implementations, as Underscore has a b
 So this library is now dependant on Underscore.
 Also, if you want to use the JSON functions, you will need a JSON library, eg: Douglas Crockford's.
 
+Validator
+---------
+
+Validator is a highly configurable and easily extended API for validating forms.
+It should work with almost every framework and form available.
+This library is currently used to power [Validator.js][].
+
+[Validator.js]: https://github.com/rossillingworth/Validator.js
+
+
+API
+---
+
 The Following is a list of the available functions, generated using the JS.OBJECT.document function.
+
+I will get round to adding a short description to each soon.
 
 ```javascript
 JS.debug

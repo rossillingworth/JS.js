@@ -497,6 +497,54 @@ var JS = {
             }
             return obj;
         }
+        ,recursiveFunctionCallGenerator:function(func,recursiveFunc,thisArg){
+            recursiveFunc = recursiveFunc || _.each;
+            return function(el,ind,arr){
+                if(el instanceof Object){
+                    return recursiveFunc(el,JS.ARRAY.recursiveFunctionCallGenerator(func,recursiveFunc,thisArg));
+                }else{
+                    return func.call(thisArg,el);
+                }
+            }
+        }
+        ,
+        /**
+         * Walk all the nodes in an Object,
+         * apply a function to all leave nodes
+         * @param k
+         * @param v
+         * @param f
+         */
+        walk:function walk(k, v, f) {
+            if (v && typeof v === 'object') {
+                for (var i in v) {
+                    if (v.hasOwnProperty(i)) {
+                        JS.OBJECT.walk(k + "." + i, v[i],f);
+                    }
+                }
+            }else{
+                f(k);
+            }
+            return;
+        }
+        ,
+        /**
+         * Use this to document all the leave nodes in an Object
+         * eg: JS.OBJECT.document(JS,"JS")
+         *
+         * @param obj
+         * @param objName
+         * @param sep
+         * @return {String}
+         */
+        document:function(obj,objName,sep){
+            objName = objName || "Object";
+            sep = sep || "\n";
+            var a = [];
+            var f = function(s){a.push(s);};
+            JS.OBJECT.walk(objName,obj,f);
+            return a.join(sep);
+        }
     }
     ,FUNCTION:{
         /**
@@ -541,9 +589,11 @@ var JS = {
         }
 
     }
-    ,REGEX:{
-        varName:/^[_$A-Za-z]$/
-    }
+    ,
+    /**
+     * Useful regular expressions I have collected
+     */
+    REGEX:{}
 };
 
 // #############################################

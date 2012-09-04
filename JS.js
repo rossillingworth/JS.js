@@ -22,12 +22,12 @@ if(!window["_"]){
 
 
 var JS = {
-    debug:false
+    debug:true
     ,debugDetail:5
     ,empty:{}
     ,deprecated:function(name){alert(name + " has been deprecated in favour of underscore");debugger;}
     ,timestamp:function(){return (new Date()).valueOf();}
-    ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && lvl<=JS.debugDetail){console.log(msg);}}
+    ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && console["log"] && lvl<=JS.debugDetail){console.log(msg);}}
     ,ASSERT:{
         AssertException:function AssertException(message) {
             this.message = message;

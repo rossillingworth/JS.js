@@ -5,14 +5,18 @@ This is my collection of simple, name spaced, utility functions for Javascript f
 
 Recently I have removed quite a few of my implementations, as Underscore has a better version.
 So this library is now dependant on Underscore.
+
 Also, if you want to use the JSON functions, you will need a JSON library, eg: Douglas Crockford's.
 
-Validator
+Validator.js
 ---------
 
-Validator is a highly configurable and easily extended API for validating forms.
-It should work with almost every framework and form available.
 This library is currently used to power [Validator.js][].
+
+Validator is a highly configurable and easily extended API for validating forms.
+Simply add a few tags to specify your tests, and it does the rest.
+It should work with almost every framework and form available.
+
 
 [Validator.js]: https://github.com/rossillingworth/Validator.js
 
@@ -72,4 +76,10 @@ JS.FUNCTION.partial
 JS.FUNCTION.overload
 ```
 
+
+Tests
+-----
+
+The functions here are all in regular use, so a lot of manual testing has been done.
+I have added the beginning of a test suite, but more are needed.
 

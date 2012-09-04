@@ -197,19 +197,17 @@ var JS = {
              * as it would bee seen by the server when submitted
              *
              * @param el
-             * @return {*}
+             * @return {*} string value, comma separated multiple values (select/checkbox), or empty string
              */
             getValue:function(el){
                 el = JS.DOM.getElement(el);
-                var type = el.tagName;
+                var tagName = el.tagName;
+                var type = el.type;
                 var value = "";
-                switch (type){
-                    case "CHECKBOX":
-                        return (el.checked)?el.value||"true":"";
-                        break;
+                switch (tagName){
                     case "SELECT":
+                        value = [];
                         var options = el.options;
-                        var value = [];
                         for(var i = 0; i < options.length; i++){
                             if(options[i].selected){
                                 value.push(options[i].value);
@@ -217,13 +215,36 @@ var JS = {
                         }
                         value = value.join(",");
                         break;
-                    case "INPUT":
                     case "TEXTAREA":
                     case "OPTION":
                         value = el.value;
                         break;
+                    case "INPUT":
+                        switch(type){
+                            case "text":
+                            case "password":
+                                value = el.value;
+                                break;
+                            case "radio":
+                                var name = el.name;
+                                var radios = document.getElementsByName(name);
+                                var activeRadio =_.find(radios,function(radio){return radio.checked;});
+                                value = (activeRadio)?activeRadio.value:"";
+                                break;
+                            case "checkbox":
+                                var name = el.name;
+                                var checkboxes = document.getElementsByName(name);
+                                checkboxes = _.filter(checkboxes,function(box){return box.checked;});
+                                checkboxes = _.map(checkboxes,function(box){return box.value});
+                                value = checkboxes.join(",");
+                                break;
+                            default:
+                                throw new Error("unknown form INPUT type: " + type);
+                                break;
+                        }
+                        break;
                     default:
-                        throw new Error("unknown form element type: " + type);
+                        throw new Error("unknown form element tagName: " + tagName);
                 }
                 return value;
             }

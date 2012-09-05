@@ -75,6 +75,7 @@ describe("JS.js Library", function(){
 
             var test1 = JS.FUNCTION.overwrite(base,[undefined,"b",undefined,"d"]);
 
+            expect(test1()).toEqual([undefined,"b",undefined,"d"]);
             expect(test1(1,2,3)).toEqual([1,"b",3,"d"]);
             expect(test1(1,2)).toEqual([1,"b",undefined,"d"]);
             expect(test1(1,2,3,4,5)).toEqual([1,"b",3,"d",5]);

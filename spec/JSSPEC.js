@@ -73,7 +73,7 @@ describe("JS.js Library", function(){
             var base = function(){return Array.prototype.slice.call(arguments);}
             expect(base(1,2,3)).toEqual([1,2,3]);
 
-            var test1 = JS.FUNCTION.overload(base,[undefined,"b",undefined,"d"]);
+            var test1 = JS.FUNCTION.overwrite(base,[undefined,"b",undefined,"d"]);
 
             expect(test1(1,2,3)).toEqual([1,"b",3,"d"]);
             expect(test1(1,2)).toEqual([1,"b",undefined,"d"]);

@@ -25,6 +25,7 @@ var JS = {
     debug:true
     ,debugDetail:5
     ,empty:{}
+    ,emptyFunc:function(){}
     ,deprecated:function(name){alert(name + " has been deprecated in favour of underscore");debugger;}
     ,timestamp:function(){return (new Date()).valueOf();}
     ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && console["log"] && lvl<=JS.debugDetail){console.log(msg);}}
@@ -515,15 +516,19 @@ var JS = {
          * @param v
          * @param f
          */
-        walk:function walk(k, v, f) {
+        walk:function walk(k, v, nodeFunc,leafFunc) {
+            var
+                nodeFunc = nodeFunc || JS.emptyFunc;
+            leafFunc = leafFunc || JS.emptyFunc;
             if (v && typeof v === 'object') {
+                nodeFunc(k);
                 for (var i in v) {
                     if (v.hasOwnProperty(i)) {
-                        JS.OBJECT.walk(k + "." + i, v[i],f);
+                        JS.OBJECT.walk(k + "." + i, v[i],nodeFunc,leafFunc);
                     }
                 }
             }else{
-                f(k);
+                leafFunc(k);
             }
             return;
         }
@@ -542,7 +547,7 @@ var JS = {
             sep = sep || "\n";
             var a = [];
             var f = function(s){a.push(s);};
-            JS.OBJECT.walk(objName,obj,f);
+            JS.OBJECT.walk(objName,obj,null,f);
             return a.join(sep);
         }
     }
@@ -573,7 +578,7 @@ var JS = {
          * @param args
          * @return {Function}
          */
-        overload:function overload(f,args/*,thisp*/){
+        overwrite:function overwrite(f,args/*,thisp*/){
             var thisp = arguments[3];
 
             return function(){

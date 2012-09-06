@@ -22,7 +22,7 @@ if(!window["_"]){
 
 
 var JS = {
-    debug:true
+    debug:(document.location.hostname == "localhost")?true:false
     ,debugDetail:5
     ,empty:{}
     ,emptyFunc:function(){}
@@ -140,10 +140,17 @@ var JS = {
         getAncestors:function(element){
             var ancestors = [];
             while(element){
-                ancestor.push(element);
+                ancestors.push(element);
                 element = element.parentNode;
             }
             return ancestors;
+        }
+        ,
+        getFirstAncestorWho:function(element,attrName,attrValue){
+            debugger;
+            var ancestors = JS.DOM.getAncestors(element);
+            var ancestor = _.find(ancestors,JS.ARRAY.FILTERS.isAttribute(attrName,attrValue));
+            return ancestor;
         }
         ,DATA:{
             /**
@@ -371,7 +378,7 @@ var JS = {
             isAttribute:function (name,value /** [,value...] **/){
                 var values = JS.ARRAY.fromCollection(arguments).slice(1);
                 return function(el,ind,arr){
-                    return el[name] && values.foldr(function(val,start){return start || el[name]==val;},false);
+                    return el[name] && _.reduce(values, function(start,val){return start || el[name]==val;},false);
                     //return el[name] && el[name]==value;
                 };
             }

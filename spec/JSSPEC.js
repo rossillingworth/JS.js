@@ -9,6 +9,9 @@ describe("JS.js Library", function(){
 
     describe("ASSERT",function(){
 
+        var oldDebug = JS.debug;
+        JS.debug = false;
+
         it("is", function(){
             expect(function () {JS.ASSERT.is(true,false,"test should fail")}).toThrow("test should fail");
             expect(function () {JS.ASSERT.is(true,true,"test should pass")}).not.toThrow("test should pass");
@@ -33,6 +36,8 @@ describe("JS.js Library", function(){
             expect(function () {JS.ASSERT.isFalse((1==0),"test should pass")}).not.toThrow("test should pass");
         });
 
+        JS.debug = oldDebug;
+
     });
 
 
@@ -44,7 +49,7 @@ describe("JS.js Library", function(){
             expect(JS.OBJECT.getProperty({a:1},"b.c.d.e.f")).toEqual(undefined);
 
             expect(JS.OBJECT.getProperty({a:1},"a")).toEqual(1);
-            expect(JS.OBJECT.getProperty({a:1,b:{c:1}},"a")).toEqual({c:1});
+            expect(JS.OBJECT.getProperty({a:1,b:{c:1}},"b")).toEqual({c:1});
 
         });
 

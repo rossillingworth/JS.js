@@ -35,6 +35,11 @@ var JS = {
         }
         ,is:function(exp,expected,message){
             if(!(_.isEqual(exp,expected))){
+                if(JS.debug){
+                    // if you have got here, you have a serious error
+                    // use your debugger stack trace to identify the cause
+                    debugger;
+                }
                 throw new Error(message);
             }
         }
@@ -124,6 +129,22 @@ var JS = {
 
             return JS.DOM.isVisible(obj.parentNode)
         }
+        ,
+        /**
+         * Get an array of all ancestor of element
+         * Includes element itself.
+         *
+         * @param element
+         * @return {Array}
+         */
+        getAncestors:function(element){
+            var ancestors = [];
+            while(element){
+                ancestor.push(element);
+                element = element.parentNode;
+            }
+            return ancestors;
+        }
         ,DATA:{
             /**
              *
@@ -192,6 +213,7 @@ var JS = {
                 var allFormElements = [].concat(inputs,lists,textareas);
                 return allFormElements;
             }
+
             ,
             /**
              * Get the value of a form element
@@ -443,11 +465,12 @@ var JS = {
          * @return {*}
          */
         getProperty:function(object,name){
-            // todo: regex validate name
+            JS.ASSERT.isTrue(_.isObject(object),".JS.OBJECT.getProperty: ["+object+"] is not an object");
+            JS.ASSERT.isTrue(_.isString(name),".JS.OBJECT.getProperty: ["+name+"] is not a string");
             name = name.split(".");
             object = object || window;
             while(name.length){
-                object = (object)?object[name.shift()]:undefined;
+                object = (object)?object[name.shift()]:name.shift(),undefined;
             }
             return object;
         }
@@ -511,7 +534,7 @@ var JS = {
         ,
         /**
          * Walk all the nodes in an Object,
-         * apply a function to all leave nodes
+         * apply functions to leafs and nodes
          * @param k
          * @param v
          * @param f
@@ -580,7 +603,7 @@ var JS = {
          */
         overwrite:function overwrite(f,args/*,thisp*/){
             var thisp = arguments[3];
-
+            JS.ASSERT.isTrue(_.isFunction(f),"JS.Function.overwrite: 1st argument is not a function");
             return function(){
                 var args2 = Array.prototype.slice.call(arguments);
                 var args3 = [];

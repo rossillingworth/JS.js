@@ -38,6 +38,16 @@ describe("JS.js Library", function(){
 
     describe("OBJECT",function(){
 
+        it("getProperty",function(){
+
+            expect(JS.OBJECT.getProperty({a:1},"b")).toEqual(undefined);
+            expect(JS.OBJECT.getProperty({a:1},"b.c.d.e.f")).toEqual(undefined);
+
+            expect(JS.OBJECT.getProperty({a:1},"a")).toEqual(1);
+            expect(JS.OBJECT.getProperty({a:1,b:{c:1}},"a")).toEqual({c:1});
+
+        });
+
         it("setProperty",function(){
 
             var o1 = {a:1};
@@ -68,7 +78,7 @@ describe("JS.js Library", function(){
 
     describe("FUNCTION",function(){
 
-        it("overload",function(){
+        it("overwrite",function(){
 
             var base = function(){return Array.prototype.slice.call(arguments);}
             expect(base(1,2,3)).toEqual([1,2,3]);

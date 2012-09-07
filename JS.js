@@ -146,10 +146,11 @@ var JS = {
             return ancestors;
         }
         ,
-        getFirstAncestorWho:function(element,attrName,attrValue){
+        getFirstAncestorWho:function(element,filterFunction){
             debugger;
+            element = JS.DOM.getElement(element);
             var ancestors = JS.DOM.getAncestors(element);
-            var ancestor = _.find(ancestors,JS.ARRAY.FILTERS.isAttribute(attrName,attrValue));
+            var ancestor = _.find(ancestors,filterFunction);
             return ancestor;
         }
         ,DATA:{
@@ -214,6 +215,7 @@ var JS = {
              * @return {Array}
              */
             getFormElements:function(form){
+                form = JS.DOM.getElement(form);
                 var inputs = JS.ARRAY.fromCollection(form.getElementsByTagName("input"));
                 var lists = JS.ARRAY.fromCollection(form.getElementsByTagName("select"));
                 var textareas = JS.ARRAY.fromCollection(form.getElementsByTagName("textarea"));
@@ -221,24 +223,33 @@ var JS = {
                 return allFormElements;
             }
             ,
-            getFormData:function(formElementsArray,type){
-                type = "JSON" || "ARRAY" || "JQUERY-OBJ";
-
+            /**
+             * Get form data as ....
+             *
+             * @param data "ElementId",Element,[formElements]
+             * @param func parsing -> function(name,value)
+             * @return {Object}
+             */
+            getFormData:function(data,func){
+                if(!_.isArray(data)){
+                    data = JS.DOM.FORM.getFormElements(data);
+                }
+                // loop over element, get value, pass name/value to generator function
+                _.each(data,function(element){
+                    var n = element.name;
+                    var v = JS.DOM.FORM.getValue(element);
+                    func(n,v);
+                });
+            }
+            ,
+            getFormDataAsJSON:function(data){
                 var out = {};
                 var f = function(n,v){
                     out[n] = v;
                 };
-
-                // loop over element, get value, pass name/value to generator function
-                _.each(formElementsArray,function(element){
-                    var n = element.name;
-                    var v = JS.DOM.FORM.getValue(element);
-                    f(n,v);
-                });
-
+                JS.DOM.FORM.getFormData(data,f);
                 return out;
             }
-
             ,
             /**
              * Get the value of a form element
@@ -270,6 +281,8 @@ var JS = {
                     case "INPUT":
                         switch(type){
                             case "text":
+                            case "button":
+                            case "submit":
                             case "password":
                                 value = el.value;
                                 break;

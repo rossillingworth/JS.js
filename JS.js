@@ -220,6 +220,24 @@ var JS = {
                 var allFormElements = [].concat(inputs,lists,textareas);
                 return allFormElements;
             }
+            ,
+            getFormData:function(formElementsArray,type){
+                type = "JSON" || "ARRAY" || "JQUERY-OBJ";
+
+                var out = {};
+                var f = function(n,v){
+                    out[n] = v;
+                };
+
+                // loop over element, get value, pass name/value to generator function
+                _.each(formElementsArray,function(element){
+                    var n = element.name;
+                    var v = JS.DOM.FORM.getValue(element);
+                    f(n,v);
+                });
+
+                return out;
+            }
 
             ,
             /**

@@ -640,7 +640,7 @@ var JS = {
          * @return {Function}
          */
         overwrite:function overwrite(f,args/*,thisp*/){
-            var thisp = arguments[3];
+            var thisp = arguments[3] || this;
             JS.ASSERT.isTrue(_.isFunction(f),"JS.Function.overwrite: 1st argument is not a function");
             return function(){
                 var args2 = Array.prototype.slice.call(arguments);

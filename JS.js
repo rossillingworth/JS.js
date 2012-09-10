@@ -30,10 +30,7 @@ var JS = {
     ,timestamp:function(){return (new Date()).valueOf();}
     ,log:function(msg,lvl){lvl=lvl||5;if (JS.debug && window["console"] && console["log"] && lvl<=JS.debugDetail){console.log(msg);}}
     ,ASSERT:{
-        AssertException:function AssertException(message) {
-            this.message = message;
-        }
-        ,is:function(exp,expected,message){
+        is:function(exp,expected,message){
             if(!(_.isEqual(exp,expected))){
                 if(JS.debug){
                     // if you have got here, you have a serious error

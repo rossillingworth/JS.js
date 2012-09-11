@@ -20,6 +20,14 @@ if(!window["_"]){
     throw new Error("JS.js requires the underscore library")
 }
 
+// just for fun
+// the Y Combinator
+function Y(f) {
+    return (
+        (function (x) {return f(function (v) { return x(x)(v); }); })
+            (function (x) {return f(function (v) { return x(x)(v); }); }));
+}
+
 
 var JS = {
     debug:(document.location.hostname == "localhost")?true:false

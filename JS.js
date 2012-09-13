@@ -31,6 +31,7 @@ function Y(f) {
 
 var JS = {
     debug:(document.location.hostname == "localhost")?true:false
+    ,firstTime:true
     ,debugDetail:5
     ,empty:{}
     ,emptyFunc:function(){}
@@ -60,10 +61,19 @@ var JS = {
          * Wrapper to getElementById
          * also accepts NODEs
          * so allows elements to be passed by ID or NODE
-         * @param el
+         * @param element
+         * @param assert if set to true, function will verify both input and output
+         * @return {Element}
          */
-        getElement:function(el){
-            return (typeof el === "string")?document.getElementById(el):el;
+        getElement:function(element,assert){
+            // assert
+            assert && JS.ASSERT.is((_.isString(element) || element.nodeType == 1),true,"getElement: bad element");
+            // assign
+            var element = (typeof element === "string")?document.getElementById(element):element;
+            // assert result
+            assert && JS.ASSERT.is(element && element.nodeType == 1,true,"getElement: unable to find element");
+            // return element
+            return element;
         }
         ,getElementsByClassName:function(className,parent,tag) {
             parent = parent || document;
@@ -313,6 +323,24 @@ var JS = {
                         throw new Error("unknown form element tagName: " + tagName);
                 }
                 return value;
+            },
+            disableHiddenFormFields:function(form){
+                debugger;
+                var children = JS.DOM.FORM.getFormElements(form);
+                children = _.each(children,JS.DOM.FORM.disableHiddenElement);
+            },
+            /**
+             * This can be used to stop form elements being submitted if they are hidden
+             *
+             * @param element DOM element, or element ID
+             */
+            disableHiddenElement:function(element){
+                element = JS.DOM.getElement(element);
+                if(JS.DOM.isVisible(element)){
+                    element.removeAttribute("disabled");
+                }else{
+                    element.setAttribute("disabled","disabled");
+                }
             }
         }
     }
@@ -338,6 +366,11 @@ var JS = {
             return String(string).replace(pattern, function(match, index) {
                 return args[index];
             });
+        }
+        ,startsWith:function(haystack,needle){
+            JS.ASSERT.is(_.isString(haystack),true,"startWith: haystack is not a string");
+            JS.ASSERT.is(_.isString(needle),true,"startWith: needle is not a string");
+            return haystack.indexOf(needle) == 0;
         }
     }
     ,COOKIE:{

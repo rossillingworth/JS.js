@@ -162,7 +162,6 @@ var JS = {
         }
         ,
         getFirstAncestorWho:function(element,filterFunction){
-            debugger;
             element = JS.DOM.getElement(element);
             var ancestors = JS.DOM.getAncestors(element);
             var ancestor = _.find(ancestors,filterFunction);
@@ -240,10 +239,11 @@ var JS = {
             ,
             /**
              * Get form data as ....
+             * func should build form data to data object
              *
              * @param data "ElementId",Element,[formElements]
-             * @param func parsing -> function(name,value)
-             * @return {Object}
+             * @param func parse form data -> function(name,value)
+             * @return nothing - callback should populate any data requirements
              */
             getFormData:function(data,func){
                 if(!_.isArray(data)){
@@ -325,17 +325,22 @@ var JS = {
                 return value;
             },
             disableHiddenFormFields:function(form){
-                debugger;
                 var children = JS.DOM.FORM.getFormElements(form);
                 children = _.each(children,JS.DOM.FORM.disableHiddenElement);
             },
             /**
-             * This can be used to stop form elements being submitted if they are hidden
+             * This can be used to stop form elements being submitted if they are NOT visible
+             * Ignores hiddne input fields
              *
              * @param element DOM element, or element ID
              */
             disableHiddenElement:function(element){
                 element = JS.DOM.getElement(element);
+                // ignore hidden inputs
+                var tn = element.tagName;
+                var type = element.getAttribute("type");
+                if(tn == "INPUT" && type && type.toLowerCase()=="hidden"){return;}
+                // disable if not visible
                 if(JS.DOM.isVisible(element)){
                     element.removeAttribute("disabled");
                 }else{
@@ -446,9 +451,12 @@ var JS = {
              */
             isAttribute:function (name,value /** [,value...] **/){
                 var values = JS.ARRAY.fromCollection(arguments).slice(1);
+//                console.log(values);
                 return function(el,ind,arr){
-                    return el[name] && _.reduce(values, function(start,val){return start || el[name]==val;},false);
-                    //return el[name] && el[name]==value;
+                    return el[name] && _.reduce(values, function(start,val){
+//                        console.log(el[name] + " ?==? " + val);
+                        return start || el[name]==val;
+                    },false);
                 };
             }
             /**
